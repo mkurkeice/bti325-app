@@ -11,7 +11,7 @@ app.get('/about', (req, res) => {
 });
 
 app.get('/', (req, res) => { //redirect user to about.html
-    res.redirect('/views/about.html');    
+    res.redirect('/about');    
 });
 
 
