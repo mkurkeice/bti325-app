@@ -18,7 +18,7 @@ const getCategories = () => {
         });
     });
 }; */
-import fs from 'fs';
+const fs = require("fs");
 
 let posts = [];
 let categories = [];
