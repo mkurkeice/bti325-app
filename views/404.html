@@ -7,11 +7,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sixtyfour+Convergence&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tiny5&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Tiny5&display=swap" rel="stylesheet">
     <title>404 Not Found</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #dbcde4;
+            background-color: #292657;
             margin: 0;
             padding: 0;
             display: flex;
@@ -21,17 +23,16 @@
             text-align: center;
             color: #333;
         }
-
         .container {
-            max-width: 600px;
+            max-width: 800px;
             padding: 20px;
-            background-color: #fff;
-            border: 1px solid #ddd;
+            background-color: #3c3b7c;
+            border: 0px solid #ddd;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
         }
         .sixtyfour-convergence-404 {
-            font-size: 100px;
+            font-size: 120px;
             font-family: "Sixtyfour Convergence", sans-serif;
             font-optical-sizing: auto;
             font-weight: 400;
@@ -42,29 +43,42 @@
                 "XELA" 0,
                 "YELA" 0;
         }
+        .tiny5-regular {
+            font-family: "Tiny5", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+            font-size: 30px;
+        }
+        .chakra-petch-light {
+            font-family: "Chakra Petch", sans-serif;
+            font-weight: 300;
+            font-style: normal;
+        }
+
         p {
-            font-size: 18px;
+            font-size: 25px;
             margin-bottom: 20px;
             font-style: oblique;
-            font-family: Roboto, sans-serif;
+            font-family: "Chakra Petch", sans-serif;
+            color: #fef8ff;
         }
-
         a {
             text-decoration: none;
-            color: #84629b;
+            color: #7571b1;
             font-weight: bold;
+            font-family: "Tiny5", sans-serif;
         }
-
         a:hover {
-            color: #8e06e9;
+            color: #1d06e9;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1 class="sixtyfour-convergence-404">404</h1>
-        <p>Oops! The page you're looking for can't be found.</p>
-        <a href="/">Go back to Home</a>
+        <p class="tiny5-regular">Oops! You seem lost.</p>
+        <p>The page you're looking for cannot be found.</p>
+        <a class="chakra-petch-light" href="/">Teleport me back!</a>
     </div>
 </body>
 </html>

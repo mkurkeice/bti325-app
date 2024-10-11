@@ -26,22 +26,24 @@ let categories = [];
 function initialize() {
     const getAllPosts = new Promise((resolve, reject) => {
         fs.readFile('./data/posts.json', 'utf8', (err, postData) => {
-            if (err) throw err;
-            console.log(data);
-            posts = JSON.parse(data)      
+            if (err) throw err;            
+            posts = JSON.parse(postData);   
+            console.log(posts);  
+            resolve();
         });
     })
 
     const getCategories = new Promise((resolve, reject) => {
         fs.readFile('./data/categories.json', 'utf8', (err, categoryData) => {
-            if (err) throw err;
-            console.log(data);
-            categories = JSON.parse(data);
+            if (err) throw err;            
+            categories = JSON.parse(categoryData);
+            console.log(categories);
+            resolve();            
         });
     })
 
     return new Promise((resolve, reject) => {
-        Promise.all([promise1, promise2]).then(() => {
+        Promise.all([getAllPosts, getCategories]).then(() => {
             resolve()
         }).catch(err => {
             reject(err)
@@ -76,3 +78,10 @@ function getCategories() {
         resolve(categories);
     });
 }
+
+module.exports = {
+    initialize,
+    getAllPosts,
+    getPublishedPosts,
+    getCategories
+};
