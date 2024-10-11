@@ -23,7 +23,7 @@ const fs = require("fs");
 let posts = [];
 let categories = [];
 
-export function initialize() {
+function initialize() {
     const getAllPosts = new Promise((resolve, reject) => {
         fs.readFile('./data/posts.json', 'utf8', (err, postData) => {
             if (err) throw err;
@@ -49,7 +49,7 @@ export function initialize() {
     });
 }
 
-export function getAllPosts(){
+function getAllPosts(){
     return new Promise((resolve, reject) => {
         if(posts.length === 0){
             reject('no results returned')
@@ -58,7 +58,7 @@ export function getAllPosts(){
     });
 }
 
-export function getPublishedPosts(){
+function getPublishedPosts(){
     return new Promise((resolve,  reject) =>{
         const publishedPosts = posts.filter(post => post.published === true);
         if (publishedPosts.length === 0) {
@@ -68,7 +68,7 @@ export function getPublishedPosts(){
     });
 }
 
-export function getCategories() {
+function getCategories() {
     return new Promise((resolve, reject) => {
         if (categories.length === 0){
             reject('no results returned');
