@@ -16,6 +16,8 @@ const app = express();
 const HTTP_PORT = process.env.PORT || 8080; //server listening on PORT 8080
 let blogService = require('./blog-service') //require blog-service.js modulef
 
+app.set('views', __dirname + '/views');
+
 app.use(express.static('public')); //static middleware to return /css/main.css
 
 app.get('/about', (req, res) => {
