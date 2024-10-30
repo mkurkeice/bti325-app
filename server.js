@@ -58,6 +58,10 @@ app.get('/categories', (req, res) => {
         })
 });
 
+app.get('/posts/add', () =>{
+    res.sendFile(path.join(__dirname, 'views/addPost.html')); 
+})
+
 app.get('*', (req, res) => {
     res.status(404).sendFile(path.join(__dirname, 'views/404.html')); // create a 404.html file
 });
