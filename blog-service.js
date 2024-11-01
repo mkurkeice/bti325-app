@@ -90,22 +90,35 @@ function addPost(postData){
 
 function getPostsByCategory(category) {
     return new Promise((resolve, reject) => {
-        const filteredPosts = posts.filter(post => post.category === parseInt(category));
-        if(filteredPosts.length === 0){
-            reject('No posts found for that category')
+        const filteredPosts = post.filter(post => post.category == category);
+        if(filteredPosts.length === 0) {
+            reject("no results returned.")
+        } else {
+            resolve(filteredPosts);
         }
-        resolve(filteredPosts);
-    })
+    });
 }
 
 function getPostsByMinDate(minDateStr) {
     return new Promise((resolve, reject) => {
-        const minDate = new Data(minDateStr); //convert to Date obj
-        const filteredPosts = posts.filter(post => new Date(post.postDate) >= minDate);
-        if(filteredPosts.length === 0) {
-            reject('No posts found for that date')
+       const minDate = new Date(minDateStr);
+       const filteredPosts = posts.filter(post => new Date(post.postDate) >= minDate);
+       if (filteredPosts.length === 0) {
+            reject("no results returned.")
+       } else {
+            resolve(filteredPosts);
+       }
+    });
+}
+
+function getPostById(id) {
+    return new Promise((resolve, reject) => {
+        const post = posts.find(post => post.id == id);
+        if(post) {
+            resolve(post);
+        } else {
+            reject("no results returned.");
         }
-        resolve(filteredPosts);
     });
 }
 
@@ -116,5 +129,6 @@ module.exports = {
     getCategories,
     addPost,
     getPostsByCategory,
-    getPostsByMinDate
+    getPostsByMinDate,
+    getPostById
 };

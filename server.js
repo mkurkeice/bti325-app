@@ -51,13 +51,33 @@ app.get('/blog', (req, res) => {
 });
 
 app.get('/posts', (req, res) => {
-    blogService.getAllPosts()
-        .then(posts => {
-            res.json(posts); 
-        })
-        .catch(err =>{
-            res.send({message: err});
-        })
+    const category = req.query.category;
+    const minDate = req.query.minDate;
+    if (category) {
+        blogService.getPostsByCategory(category)
+            .then(posts => {
+                res.json(posts);
+            })
+            .catch(err => {
+                res.status(404).send({ message: `Error retrieving posts by category: ${err}` });
+            });
+    } else if (minDate) {
+        blogService.getPostsByMinDate(minDate)
+            .then(posts => {
+                res.json(posts);
+            })
+            .catch(err => {
+                res.status(404).send({ message: `Error retrieving posts by minimum date: ${err}` });
+            });
+    }  else {
+        blogService.getAllPosts()
+            .then(posts => {
+                res.json(posts);
+            })
+            .catch(err => {
+                res.status(404).send({ message: `Error retrieving all posts: ${err}` });
+            });
+    }
 });
 
 app.get('/categories', (req, res) => {
