@@ -90,7 +90,7 @@ function addPost(postData){
 
 function getPostsByCategory(category) {
     return new Promise((resolve, reject) => {
-        const filteredPosts = post.filter(post => post.category == category);
+        const filteredPosts = post.filter(post => post.category == category); //check category if matched with category param
         if(filteredPosts.length === 0) {
             reject("no results returned.")
         } else {
@@ -102,7 +102,7 @@ function getPostsByCategory(category) {
 function getPostsByMinDate(minDateStr) {
     return new Promise((resolve, reject) => {
        const minDate = new Date(minDateStr);
-       const filteredPosts = posts.filter(post => new Date(post.postDate) >= minDate);
+       const filteredPosts = posts.filter(post => new Date(post.postDate) >= minDate); //check if post date is greater than or equal to minDateStr value
        if (filteredPosts.length === 0) {
             reject("no results returned.")
        } else {
