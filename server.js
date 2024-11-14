@@ -18,6 +18,7 @@ let blogService = require('./blog-service') //require blog-service.js modulef
 const multer = require("multer");
 const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
+const exphbs = require('express-handlebars');
 
 cloudinary.config({
     cloud_name: 'ddszqifml',
@@ -26,6 +27,10 @@ cloudinary.config({
     secure: true
 });
 
+app.engine('.hbs', exphbs.engine({ extname: '.hbs' }));
+
+app.set('view engine', '.hbs');
+
 const upload = multer(); //no { storage : storage } because not using disk storage
 
 app.set('views', __dirname + '/views');
@@ -33,7 +38,7 @@ app.set('views', __dirname + '/views');
 app.use(express.static('public')); //static middleware to return /css/main.css
 
 app.get('/about', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views/about.html')); 
+    res.render('about');
 });
 
 app.get('/', (req, res) => { //redirect user to about.html
