@@ -85,27 +85,27 @@ app.get('/posts', (req, res) => {
     const minDate = req.query.minDate;
     if (category) {
         blogService.getPostsByCategory(category)
-            .then(posts => {
-                res.json(posts);
+            .then(data => {
+                res.render("posts", {posts: data});
             })
             .catch(err => {
-                res.status(404).send({ message: `Error retrieving posts by category: ${err}` });
+                res.render("posts", {message: "no results"});
             });
     } else if (minDate) {
         blogService.getPostsByMinDate(minDate)
-            .then(posts => {
-                res.json(posts);
+            .then(data => {
+                res.render("posts", {posts: data});
             })
             .catch(err => {
-                res.status(404).send({ message: `Error retrieving posts by minimum date: ${err}` });
+                res.render("posts", {message: "no results"});
             });
-    }  else {
+    } else {
         blogService.getAllPosts()
-            .then(posts => {
-                res.json(posts);
+            .then(data => {
+                res.render("posts", {posts: data});
             })
             .catch(err => {
-                res.status(404).send({ message: `Error retrieving all posts: ${err}` });
+                res.render("posts", {message: "no results"});
             });
     }
 });
