@@ -19,6 +19,7 @@ const multer = require("multer");
 const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
 const exphbs = require('express-handlebars');
+const stripJs = require('strip-js');
 
 cloudinary.config({
     cloud_name: 'ddszqifml',
@@ -50,7 +51,10 @@ app.engine('.hbs', exphbs.engine({
             } else {
                 return options.fn(this);
             }
-        }
+        },
+        safeHTML: function(context){
+            return stripJs(context);
+        }        
     }
 }));
 
@@ -70,14 +74,80 @@ app.get('/', (req, res) => { //redirect user to about.html
     res.redirect('/about');    
 });
 
-app.get('/blog', (req, res) => {
-    blogService.getPublishedPosts()
-        .then(publishedPosts => {
-            res.json(publishedPosts); 
-        })
-        .catch(err =>{
-            res.send({message: err});
-        })
+app.get('/blog', async (req, res) => {
+    // Declare an object to store properties for the view
+    let viewData = {};
+    try{
+        // declare empty array to hold "post" objects
+        let posts = [];
+        // if there's a "category" query, filter the returned posts by category
+        if(req.query.category){
+            // Obtain the published "posts" by category
+            posts = await blogData.getPublishedPostsByCategory(req.query.category);
+        }else{
+            // Obtain the published "posts"
+            posts = await blogData.getPublishedPosts();
+        }
+        // sort the published posts by postDate
+        posts.sort((a,b) => new Date(b.postDate) - new Date(a.postDate));
+        // get the latest post from the front of the list (element 0)
+        let post = posts[0]; 
+        // store the "posts" and "post" data in the viewData object (to be passed to the view)
+        viewData.posts = posts;
+        viewData.post = post;
+    }catch(err){
+        viewData.message = "no results";
+    }
+    try{
+        // Obtain the full list of "categories"
+        let categories = await blogData.getCategories();
+        // store the "categories" data in the viewData object (to be passed to the view)
+        viewData.categories = categories;
+    }catch(err){
+        viewData.categoriesMessage = "no results"
+    }
+    // render the "blog" view with all of the data (viewData)
+    res.render("blog", {data: viewData})
+});
+
+app.get('/blog/:id', async (req, res) => {
+    // Declare an object to store properties for the view
+    let viewData = {};
+    try{
+        // declare empty array to hold "post" objects
+        let posts = [];
+        // if there's a "category" query, filter the returned posts by category
+        if(req.query.category){
+            // Obtain the published "posts" by category
+            posts = await blogData.getPublishedPostsByCategory(req.query.category);
+        }else{
+            // Obtain the published "posts"
+            posts = await blogData.getPublishedPosts();
+        }
+        // sort the published posts by postDate
+        posts.sort((a,b) => new Date(b.postDate) - new Date(a.postDate));
+        // store the "posts" and "post" data in the viewData object (to be passed to the view)
+        viewData.posts = posts;
+    }catch(err){
+        viewData.message = "no results";
+    }
+    try{
+        // Obtain the post by "id"
+        viewData.post = await blogData.getPostById(req.params.id);
+    }catch(err){
+        viewData.message = "no results"; 
+    }
+    try{
+        // Obtain the full list of "categories"
+        let categories = await blogData.getCategories();
+
+        // store the "categories" data in the viewData object (to be passed to the view)
+        viewData.categories = categories;
+    }catch(err){
+        viewData.categoriesMessage = "no results"
+    }
+    // render the "blog" view with all of the data (viewData)
+    res.render("blog", {data: viewData})
 });
 
 app.get('/posts', (req, res) => {
@@ -112,11 +182,11 @@ app.get('/posts', (req, res) => {
 
 app.get('/categories', (req, res) => {
     blogService.getCategories()
-        .then(categories => {
-            res.json(categories);
+        .then(data => {
+            res.render("categories", {categories: data});
         })
         .catch(err =>{
-            res.send({message: err});
+            res.render("categories", {message: "no results"});
         })
 });
 

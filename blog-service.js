@@ -82,7 +82,9 @@ function getCategories() {
 function addPost(postData){
     return new Promise((resolve, reject) => {
         postData.published = postData.published ? true : false; //set status falsse if undefined
-        postData.id = posts.length + 1; //length of post array + 1 
+        const currentDate = new Date();
+        postData.postDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
+        postData.id = posts.length + 1; 
         posts.push(postData); //push data into array
         resolve(postData);
     })
@@ -122,6 +124,16 @@ function getPostById(id) {
     });
 }
 
+function getPublishedPostsByCategory(category){
+    return new Promise((resolve,  reject) =>{
+        const publishedPosts = posts.filter(post => post.published === true && post.category == category);
+        if (publishedPosts.length === 0) {
+            reject('no results returned');
+        }
+        resolve(publishedPosts);
+    });
+}
+
 module.exports = {
     initialize,
     getAllPosts,
@@ -130,5 +142,6 @@ module.exports = {
     addPost,
     getPostsByCategory,
     getPostsByMinDate,
-    getPostById
+    getPostById,
+    getPublishedPostsByCategory
 };
