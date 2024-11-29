@@ -165,10 +165,14 @@ app.get('/posts', (req, res) => {
     }
 
     queryPromise.then(data => {
-        res.render("posts", {posts: data});
+        if (data.length > 0) {
+            res.render("posts", {posts: data});
+        } else {
+            res.render("posts", {message: "no results"});    
+        }
     }).catch(err => {
         res.render("posts", {message: "no results"});
-    })
+    });
 });
 
 app.get('/post/:id', (req,res)=>{
@@ -181,11 +185,15 @@ app.get('/post/:id', (req,res)=>{
 
 app.get('/categories', (req, res) => {
     blogData.getCategories().then(data => {
-        res.render("categories", {categories: data});
+        if (data.length > 0) {
+            res.render("categories", {categories: data});
+        } else {
+            res.render("categories", {message: "no results"});    
+        }        
     })
     .catch(err =>{
         res.render("categories", {message: "no results"});
-    })
+    });
 });
 
 app.get('/posts/add', (req, res) => {
@@ -234,9 +242,9 @@ app.post('/posts/add', upload.single('featureImage'), (req, res)=> {
             res.redirect("/posts");
         }).catch(err=>{
             res.status(500).send(err);
-        })
+        });
     } 
-})
+});
 
 blogData.initialize() //server starts if .json files successfully parse
     .then(() => {

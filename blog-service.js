@@ -17,7 +17,7 @@ function initialize() {
             resolve();
         }).catch((err) => {
             reject("unable to sync the database")
-        })
+        });
     });
 }
 
@@ -27,7 +27,7 @@ function getAllPosts(){
             resolve(data);
         }).catch((err) =>{
             reject("no results returned");
-        })
+        });
     });
 }
 
@@ -82,7 +82,7 @@ function getPostsByCategory(category) {
             resolve(data); 
         }).catch((err) => { 
             reject("no results returned");
-        })
+        });
     });
 }
 
@@ -99,7 +99,7 @@ function getPostsByMinDate(minDateStr) {
             resolve(data); 
         }).catch((err) => { 
             reject("no results returned"); 
-        }); 
+        });
     }); 
 }
 
@@ -130,8 +130,51 @@ function getPublishedPostsByCategory(category){
             resolve(data); 
         }).catch((err) => { 
             reject("no results returned"); 
-        }); 
+        });
     });
+}
+
+function addCategory(categoryData) { 
+    return new Promise((resolve, reject) => {         
+        for (let prop in categoryData) { 
+            if (categoryData[prop] === "") { 
+                categoryData[prop] = null; 
+            } 
+        }         
+        Category.create(categoryData).then(() => { 
+            resolve(); 
+        }).catch((err) => { 
+            reject("unable to create category"); 
+        });
+   });
+}
+
+function deleteCategoryById(id) { 
+    return new Promise((resolve, reject) => { 
+        Category.destroy({ 
+            where: { 
+                id: id 
+            } 
+        }).then(() => { 
+            resolve(); 
+        }).catch((err) => { 
+            reject("unable to delete category"); 
+        }); 
+    }); 
+}
+
+function deletePostById(id) { 
+    return new Promise((resolve, reject) => { 
+        Post.destroy({ 
+            where: { 
+                id: id 
+            } 
+        }).then(() => { 
+            resolve(); 
+        }).catch((err) => { 
+            reject("unable to delete post"); 
+        }); 
+    }); 
 }
 
 const Post = sequelize.define('Post', {
