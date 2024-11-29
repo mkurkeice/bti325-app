@@ -1,136 +1,67 @@
-/* const getAllPosts = () => { 
-    return new Promise((resolve) => {
-        fs.readFile('./data/posts.json', 'utf8', (err, data) => {
-            resolve(JSON.parse(data)); //parse data to JSON 
-        });
-    });
-}
+const Sequelize = require('sequelize');
 
-const getPublishedPosts = () => {
-    return getAllPosts()
-        .then(posts => posts.filter(post => post.published === true)); //get only published posts
-};
+var sequelize = new Sequelize('SenecaDB', 'SenecaDB_owner', 'ClcDSYyI3tE0', {
+    host: 'ep-dawn-butterfly-a5afy8z7.us-east-2.aws.neon.tech',
+    dialect: 'postgres',
+    port: 5432,
+    dialectOptions: {
+        ssl: { rejectUnauthorized: false }
+    },
+    query: { raw: true }
+});
 
-const getCategories = () => {
-    return new Promise((resolve) => {
-        fs.readFile('./data/categories.json', 'utf8', (err, data) => {
-            resolve(JSON.parse(data)); 
-        });
-    });
-}; */
-const fs = require("fs");
-
-let posts = [];
-let categories = [];
 
 function initialize() {
-    const getAllPosts = new Promise((resolve, reject) => {
-        fs.readFile('./data/posts.json', 'utf8', (err, postData) => {
-            if (err) throw err;            
-            posts = JSON.parse(postData);   
-            console.log(posts);  
-            resolve();
-        });
-    })
-
-    const getCategories = new Promise((resolve, reject) => {
-        fs.readFile('./data/categories.json', 'utf8', (err, categoryData) => {
-            if (err) throw err;            
-            categories = JSON.parse(categoryData);
-            console.log(categories);
-            resolve();            
-        });
-    })
-
     return new Promise((resolve, reject) => {
-        Promise.all([getAllPosts, getCategories]).then(() => {
-            resolve()
-        }).catch(err => {
-            reject(err)
-        });
+        reject();
     });
 }
 
 function getAllPosts(){
     return new Promise((resolve, reject) => {
-        if(posts.length === 0){
-            reject('no results returned')
-        }
-        resolve(posts);
+        reject();
     });
 }
 
 function getPublishedPosts(){
-    return new Promise((resolve,  reject) =>{
-        const publishedPosts = posts.filter(post => post.published === true);
-        if (publishedPosts.length === 0) {
-            reject('no results returned');
-        }
-        resolve(publishedPosts);
+    return new Promise((resolve, reject) => {
+        reject();
     });
 }
 
 function getCategories() {
     return new Promise((resolve, reject) => {
-        if (categories.length === 0){
-            reject('no results returned');
-        }
-        resolve(categories);
+        reject();
     });
 }
 
 function addPost(postData){
     return new Promise((resolve, reject) => {
-        postData.published = postData.published ? true : false; //set status falsse if undefined
-        const currentDate = new Date();
-        postData.postDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
-        postData.id = posts.length + 1; 
-        posts.push(postData); //push data into array
-        resolve(postData);
-    })
+        reject();
+    });
 }
 
 function getPostsByCategory(category) {
     return new Promise((resolve, reject) => {
-        const filteredPosts = post.filter(post => post.category == category); //check category if matched with category param
-        if(filteredPosts.length === 0) {
-            reject("no results returned.")
-        } else {
-            resolve(filteredPosts);
-        }
+        reject();
     });
 }
 
 function getPostsByMinDate(minDateStr) {
     return new Promise((resolve, reject) => {
-       const minDate = new Date(minDateStr);
-       const filteredPosts = posts.filter(post => new Date(post.postDate) >= minDate); //check if post date is greater than or equal to minDateStr value
-       if (filteredPosts.length === 0) {
-            reject("no results returned.")
-       } else {
-            resolve(filteredPosts);
-       }
+        reject();
     });
 }
 
 function getPostById(id) {
     return new Promise((resolve, reject) => {
-        const post = posts.find(post => post.id == id);
-        if(post) {
-            resolve(post);
-        } else {
-            reject("no results returned.");
-        }
+        reject();
     });
 }
 
 function getPublishedPostsByCategory(category){
-    return new Promise((resolve,  reject) =>{
-        const publishedPosts = posts.filter(post => post.published === true && post.category == category);
-        if (publishedPosts.length === 0) {
-            reject('no results returned');
-        }
-        resolve(publishedPosts);
+    return new Promise((resolve, reject) => {
+        reject();
     });
 }
 
