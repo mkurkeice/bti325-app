@@ -14,7 +14,7 @@ const express = require('express'); //express module
 const path = require('path');
 const app = express();
 const HTTP_PORT = process.env.PORT || 8080; //server listening on PORT 8080
-let blogService = require('./blog-service') //require blog-service.js modulef
+let blogData = require('./blog-service') //require blog-service.js modulef
 const multer = require("multer");
 const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
@@ -180,7 +180,7 @@ app.get('/post/:id', (req,res)=>{
 });
 
 app.get('/categories', (req, res) => {
-    blogService.getCategories().then(data => {
+    blogData.getCategories().then(data => {
         res.render("categories", {categories: data});
     })
     .catch(err =>{
@@ -238,7 +238,7 @@ app.post('/posts/add', upload.single('featureImage'), (req, res)=> {
     } 
 })
 
-blogService.initialize() //server starts if .json files successfully parse
+blogData.initialize() //server starts if .json files successfully parse
     .then(() => {
         app.listen(HTTP_PORT, () => {
             console.log(`Server listening on port ${HTTP_PORT}`); //initialization successful, server starts
