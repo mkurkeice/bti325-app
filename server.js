@@ -8,7 +8,7 @@
 *  Online (Vercel) Link: https://bti325-hb4orti76-manualla-kurkeices-projects.vercel.app
 *
 ********************************************************************************/ 
-
+//updates made with assignment 4 solution***
 
 const express = require('express'); //express module
 const path = require('path');
@@ -28,12 +28,7 @@ cloudinary.config({
     secure: true
 });
 
-app.use(function(req, res, next){
-    let route = req.path.substring(1);
-    app.locals.activeRoute = "/" + (isNaN(route.split('/')[1]) ? route.replace(/\/(?!.*)/,"") : route.replace(/\/(.*)/,""));
-    app.locals.viewingCategory = req.query.category;
-    next();
-});
+const upload = multer(); //no { storage : storage } because not using disk storage
 
 app.engine('.hbs', exphbs.engine({ 
     extname: '.hbs',
@@ -66,18 +61,21 @@ app.engine('.hbs', exphbs.engine({
 
 app.set('view engine', '.hbs');
 
-const upload = multer(); //no { storage : storage } because not using disk storage
-
-app.set('views', __dirname + '/views');
-
 app.use(express.static('public')); //static middleware to return /css/main.css
 
-app.get('/about', (req, res) => {
+app.use(function(req, res, next){
+    let route = req.path.substring(1);
+    app.locals.activeRoute = "/" + (isNaN(route.split('/')[1]) ? route.replace(/\/(?!.*)/,"") : route.replace(/\/(.*)/,""));
+    app.locals.viewingCategory = req.query.category;
+    next();
+});
+
+app.get('/about', (req, res) => { //redirect user to about.html
     res.render('about');
 });
 
-app.get('/', (req, res) => { //redirect user to about.html
-    res.redirect('/about');    
+app.get('/', (req, res) => { 
+    res.redirect('/blog');    
 });
 
 app.get('/blog', async (req, res) => {
@@ -157,43 +155,37 @@ app.get('/blog/:id', async (req, res) => {
 });
 
 app.get('/posts', (req, res) => {
-    const category = req.query.category;
-    const minDate = req.query.minDate;
-    if (category) {
-        blogService.getPostsByCategory(category)
-            .then(data => {
-                res.render("posts", {posts: data});
-            })
-            .catch(err => {
-                res.render("posts", {message: "no results"});
-            });
-    } else if (minDate) {
-        blogService.getPostsByMinDate(minDate)
-            .then(data => {
-                res.render("posts", {posts: data});
-            })
-            .catch(err => {
-                res.render("posts", {message: "no results"});
-            });
+    let queryPromise = null;
+    if (req.query.category) {
+        queryPromise = blogData.getPostsByCategory(req.query.category);
+    } else if (req.query.minDate) {
+        queryPromise = blogData.getPostsByMinDate(req.query.minDate);
     } else {
-        blogService.getAllPosts()
-            .then(data => {
-                res.render("posts", {posts: data});
-            })
-            .catch(err => {
-                res.render("posts", {message: "no results"});
-            });
+        queryPromise = blogData.getAllPosts()
     }
+
+    queryPromise.then(data => {
+        res.render("posts", {posts: data});
+    }).catch(err => {
+        res.render("posts", {message: "no results"});
+    })
+});
+
+app.get('/post/:id', (req,res)=>{
+    blogData.getPostById(req.params.id).then(data=>{
+        res.json(data);
+    }).catch(err=>{
+        res.json({message: err});
+    });
 });
 
 app.get('/categories', (req, res) => {
-    blogService.getCategories()
-        .then(data => {
-            res.render("categories", {categories: data});
-        })
-        .catch(err =>{
-            res.render("categories", {message: "no results"});
-        })
+    blogService.getCategories().then(data => {
+        res.render("categories", {categories: data});
+    })
+    .catch(err =>{
+        res.render("categories", {message: "no results"});
+    })
 });
 
 app.get('/posts/add', (req, res) => {
@@ -201,46 +193,49 @@ app.get('/posts/add', (req, res) => {
 })
 
 app.get('*', (req, res) => {
-    res.status(404).sendFile(path.join(__dirname, 'views/404.html')); // create a 404.html file
+    res.status(404).render("404"); // render 404.hbs
 });
 
 app.post('/posts/add', upload.single('featureImage'), (req, res)=> {
-    let streamUpload = (req) => {
-        return new Promise((resolve, reject) => {
-            let stream = cloudinary.uploader.upload_stream(
-                (error, result) => {
-                if (result) {
-                    resolve(result);
-                } else {
-                    reject(error);
+    if (req.file){
+        let streamUpload = (req) => {
+            return new Promise((resolve, reject) => {
+                let stream = cloudinary.uploader.upload_stream(
+                    (error, result) => {
+                    if (result) {
+                        resolve(result);
+                    } else {
+                        reject(error);
+                    }
                 }
-                }
-            );
-    
-            streamifier.createReadStream(req.file.buffer).pipe(stream);
-        });
-    };
-    
-    async function upload(req) {
-        let result = await streamUpload(req);
-        console.log(result);
-        return result;
+                );
+        
+                streamifier.createReadStream(req.file.buffer).pipe(stream);
+            });
+        }; 
+        
+        async function upload(req) {
+            let result = await streamUpload(req);
+            console.log(result);
+            return result;
+        }
+
+        upload(req).then((uploaded)=>{
+            processPost(uploaded.url);
+        })
+    } else {
+        processPost("");
     }
     
-    upload(req).then((uploaded)=>{
-        req.body.featureImage = uploaded.url;    
-        // TODO: Process the req.body and add it as a new Blog Post 
-        // before redirecting to /posts        
-        blogService.addPost(req.body)
-            .then(() => {
-                res.redirect('/posts'); //redirect to posts
-            })
-            .catch((err) =>{
-                res.status(500).send({message: `Error adding post: ${err}`}); //if addpost fails
-            })        
-    }).catch((err) => {
-        res.status(500).send({message: `Image upload failed: ${err}`}); //if image upload fails
-    });    
+    function processPost(imageUrl){
+        req.body.featureImage = imageUrl;
+
+        blogData.addPost(req.body).then(post=>{
+            res.redirect("/posts");
+        }).catch(err=>{
+            res.status(500).send(err);
+        })
+    } 
 })
 
 blogService.initialize() //server starts if .json files successfully parse
