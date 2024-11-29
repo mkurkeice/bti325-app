@@ -65,6 +65,18 @@ function getPublishedPostsByCategory(category){
     });
 }
 
+const Post = sequelize.define('Post', {
+    body: Sequelize.TEXT,
+    title: Sequelize.STRING,
+    postDate: Sequelize.DATE,
+    featureImage: Sequelize.STRING,
+    published: Sequelize.BOOLEAN,
+});
+
+const Category = sequelize.define('Category', {
+    category: Sequelize.STRING,    
+});
+
 module.exports = {
     initialize,
     getAllPosts,
