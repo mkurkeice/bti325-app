@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 
-const sequelize = new Sequelize('postgresql://SenecaDB_owner:ClcDSYyI3tE0@ep-dawn-butterfly-a5afy8z7.us-east-2.aws.neon.tech/SenecaDB?sslmode=require', {
+const sequelize = new Sequelize('postgres://admin:admin@localhost:5432/mydb', {
   dialectModule: require('pg')
 });
 
