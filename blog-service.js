@@ -1,9 +1,17 @@
 const Sequelize = require('sequelize');
 
-const sequelize = new Sequelize('postgres://admin:admin@localhost:5432/mydb', {
-  dialectModule: require('pg')
-});
-
+const sequelize = new Sequelize(process.env.postgresql://SenecaDB_owner:<password>@ep-dawn-butterfly-a5afy8z7.us-east-2.aws.neon.tech/SenecaDB?sslmode=require
+    , {
+    dialect: 'postgres',
+    dialectModule: require('pg'),
+    dialectOptions: {
+      ssl: {
+        require: true, 
+        rejectUnauthorized: false, 
+      },
+    },
+  });
+  
 /* var sequelize = new Sequelize('SenecaDB', 'SenecaDB_owner', 'ClcDSYyI3tE0', {
     host: 'ep-dawn-butterfly-a5afy8z7.us-east-2.aws.neon.tech',
     dialect: 'postgres',

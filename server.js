@@ -21,6 +21,8 @@ const streamifier = require('streamifier');
 const exphbs = require('express-handlebars');
 const stripJs = require('strip-js');
 
+module.exports = app;
+
 cloudinary.config({
     cloud_name: 'ddszqifml',
     api_key: '414579164121834',
