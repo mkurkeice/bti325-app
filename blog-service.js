@@ -1,15 +1,18 @@
 const Sequelize = require('sequelize');
 
-var sequelize = new Sequelize('SenecaDB', 'SenecaDB_owner', 'ClcDSYyI3tE0', {
-    dialectModule: require('pg'),
+const sequelize = new Sequelize('postgresql://SenecaDB_owner:ClcDSYyI3tE0@ep-dawn-butterfly-a5afy8z7.us-east-2.aws.neon.tech/SenecaDB?sslmode=require', {
+  dialectModule: require('pg')
+});
+
+/* var sequelize = new Sequelize('SenecaDB', 'SenecaDB_owner', 'ClcDSYyI3tE0', {
     host: 'ep-dawn-butterfly-a5afy8z7.us-east-2.aws.neon.tech',
-    dialect: 'postgres',    
+    dialect: 'postgres',
     port: 5432,
     dialectOptions: {
         ssl: { rejectUnauthorized: false }
     },
     query: { raw: true }
-});
+}); */
 
 
 function initialize() {
