@@ -9,7 +9,23 @@ const sequelize = new Sequelize('postgresql://SenecaDB_owner:ClcDSYyI3tE0@ep-daw
         rejectUnauthorized: false, 
       },
     },
-  });
+});
+
+export const dbConfig = {
+    username: process.env.SenecaDB_owner,
+    password: process.env.ClcDSYyI3tE0,
+    database: process.env.SenecaDB,
+    host: 'ep-dawn-butterfly-a5afy8z7.us-east-2.aws.neon.tech',
+    port: 5432,
+    dialect: 'postgres',
+    dialectModule: pg, 
+    timezone: process.env.TZ,
+    define: {
+      charset: 'utf8mb4',
+      collate: 'utf8mb4_general_ci',
+    },
+    logging: false,
+};
   
 /* var sequelize = new Sequelize('SenecaDB', 'SenecaDB_owner', 'ClcDSYyI3tE0', {
     host: 'ep-dawn-butterfly-a5afy8z7.us-east-2.aws.neon.tech',
