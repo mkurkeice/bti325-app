@@ -1,8 +1,9 @@
 const Sequelize = require('sequelize');
+const pg = require('pg');
 
 const sequelize = new Sequelize('postgresql://SenecaDB_owner:ClcDSYyI3tE0@ep-dawn-butterfly-a5afy8z7.us-east-2.aws.neon.tech/SenecaDB?sslmode=require'  , {
     dialect: 'postgres',
-    dialectModule: require('pg'),
+    dialectModule: pg,
     dialectOptions: {
       ssl: {
         require: true, 
