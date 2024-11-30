@@ -63,6 +63,8 @@ app.set('view engine', '.hbs');
 
 app.use(express.static('public')); //static middleware to return /css/main.css
 
+app.use(express.urlencoded({extended: true}));
+
 app.use(function(req, res, next){
     let route = req.path.substring(1);
     app.locals.activeRoute = "/" + (isNaN(route.split('/')[1]) ? route.replace(/\/(?!.*)/,"") : route.replace(/\/(.*)/,""));
@@ -198,7 +200,36 @@ app.get('/categories', (req, res) => {
 
 app.get('/posts/add', (req, res) => {
     res.render('addPost'); 
-})
+});
+
+app.get('/categories/add', (req, res) =>{
+    res.render('addCategory');
+});
+
+app.post('/categories/add', (req, res) => {
+    blogService.addCategory(req.body).then(() => {
+        res.redirect('/categories');
+    }).catch((err) =>{
+        res.status(500).sendStatus("Unable to add category");
+    });
+});
+
+app.get('/categories/delete/:id', (req, res) =>{
+    blogService.deleteCategoryById(req.params.id).then(() => {
+        res.redirect('/categories');
+    }).catch(err => {
+        res.status(500).send("Unable to Remove Category / Category not found");
+    });
+});
+
+
+app.get('/posts/delete/:id', (req, res) =>{
+    blogService.deletePostById(req.params.id).then(() => {
+        res.redirect('/posts');
+    }).catch(err => {
+        res.status(500).send("Unable to Remove Post / Post not found");
+    });
+});
 
 app.get('*', (req, res) => {
     res.status(404).render("404"); // render 404.hbs
