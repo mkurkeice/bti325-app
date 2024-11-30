@@ -1,8 +1,24 @@
 const Sequelize = require('sequelize');
 
-const sequelize = new Sequelize('postgresql://SenecaDB_owner:ClcDSYyI3tE0@ep-dawn-butterfly-a5afy8z7.us-east-2.aws.neon.tech/SenecaDB?sslmode=require', {
-  dialectModule: require('pg')
-});
+const sequelize = new Sequelize(
+    'SenecaDB', 
+    'SenecaDB_owner', 
+    'ClcDSYyI3tE0', 
+    {
+      host: 'ep-dawn-butterfly-a5afy8z7.us-east-2.aws.neon.tech',
+      dialect: 'postgres',
+      port: 5432, 
+      dialectModule: require('pg'),
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false, 
+        },
+      },
+      query: { raw: true }, 
+    }
+  );
+  
 
 /* var sequelize = new Sequelize('SenecaDB', 'SenecaDB_owner', 'ClcDSYyI3tE0', {
     host: 'ep-dawn-butterfly-a5afy8z7.us-east-2.aws.neon.tech',
@@ -207,5 +223,6 @@ module.exports = {
     getPublishedPostsByCategory,
     addCategory,
     deleteCategoryById,
-    deletePostById
+    deletePostById,
+    sequelize
 };
