@@ -200,5 +200,8 @@ module.exports = {
     getPostsByCategory,
     getPostsByMinDate,
     getPostById,
-    getPublishedPostsByCategory
+    getPublishedPostsByCategory,
+    addCategory,
+    deleteCategoryById,
+    deletePostById
 };

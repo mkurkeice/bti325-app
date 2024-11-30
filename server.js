@@ -199,7 +199,40 @@ app.get('/categories', (req, res) => {
 });
 
 app.get('/posts/add', (req, res) => {
-    res.render('addPost'); 
+    blogData.getCategories().then(data => {
+        res.render('addPost', { categories: data });
+    }).catch((err) => {
+        res.render('addPost', { categories: [] });
+    });
+});
+
+app.post('/posts/add', upload.single('featureImage'), (req, res) =>{
+    if (req.file) {
+        let streamUpload = (req) => {
+            return new Promise((resolve, reject) => {
+                let stream = cloudinary.uploader.upload_stream((error, result) => {
+                    if (result) {
+                        resolve();
+                    } else {
+                        reject(error);
+                    }
+                });
+                streamifier.createReadStream(req.file.buffer).pipe(stream);
+            });
+            
+            async function upload(req) {
+                let result = await streamUpload(req);
+                console.log(result);
+                return result;
+            }
+
+            upload(req).then((uploaded) => {
+                processPost(uploaded.url);
+            });
+        }
+    } else {
+        processPost("")
+    }
 });
 
 app.get('/categories/add', (req, res) =>{
@@ -207,7 +240,7 @@ app.get('/categories/add', (req, res) =>{
 });
 
 app.post('/categories/add', (req, res) => {
-    blogService.addCategory(req.body).then(() => {
+    blogData.addCategory(req.body).then(() => {
         res.redirect('/categories');
     }).catch((err) =>{
         res.status(500).sendStatus("Unable to add category");
@@ -215,7 +248,7 @@ app.post('/categories/add', (req, res) => {
 });
 
 app.get('/categories/delete/:id', (req, res) =>{
-    blogService.deleteCategoryById(req.params.id).then(() => {
+    blogData.deleteCategoryById(req.params.id).then(() => {
         res.redirect('/categories');
     }).catch(err => {
         res.status(500).send("Unable to Remove Category / Category not found");
@@ -224,7 +257,7 @@ app.get('/categories/delete/:id', (req, res) =>{
 
 
 app.get('/posts/delete/:id', (req, res) =>{
-    blogService.deletePostById(req.params.id).then(() => {
+    blogData.deletePostById(req.params.id).then(() => {
         res.redirect('/posts');
     }).catch(err => {
         res.status(500).send("Unable to Remove Post / Post not found");
@@ -246,9 +279,7 @@ app.post('/posts/add', upload.single('featureImage'), (req, res)=> {
                     } else {
                         reject(error);
                     }
-                }
-                );
-        
+                });        
                 streamifier.createReadStream(req.file.buffer).pipe(stream);
             });
         }; 
