@@ -35,14 +35,14 @@ cloudinary.config({
 const upload = multer(); //no { storage : storage } because not using disk storage
 
 app.engine('.hbs', exphbs.engine({ 
-    extname: '.hbs',
+    extname: ".hbs",
     helpers: {
         navLink: function(url, options){
             return '<li' + 
                 ((url == app.locals.activeRoute) ? ' class="active" ' : '') + 
                 '><a href="' + url + '">' + options.fn(this) + '</a></li>';
         },
-        equal: function(lvalue, rvalue, options) {
+        equal: function (lvalue, rvalue, options) {
             if (arguments.length < 3)
                 throw new Error("Handlebars Helper equal needs 2 parameters");
             if (lvalue != rvalue) {
@@ -59,7 +59,7 @@ app.engine('.hbs', exphbs.engine({
             let month = (dateObj.getMonth() + 1).toString();
             let day = dateObj.getDate().toString();
             return `${year}-${month.padStart(2, '0')}-${day.padStart(2,'0')}`;
-        }          
+        }
     }
 }));
 
