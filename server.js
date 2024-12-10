@@ -12,14 +12,16 @@
 
 const express = require('express'); //express module
 const path = require('path');
-const app = express();
-const HTTP_PORT = process.env.PORT || 8080; //server listening on PORT 8080
 let blogData = require('./blog-service') //require blog-service.js modulef
 const multer = require("multer");
 const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
 const exphbs = require('express-handlebars');
 const stripJs = require('strip-js');
+
+const app = express();
+
+const HTTP_PORT = process.env.PORT || 8080; //server listening on PORT 8080
 
 module.exports = app;
 
