@@ -20,7 +20,7 @@ const exphbs = require('express-handlebars');
 const stripJs = require('strip-js');
 const mongoose = require('mongoose');
 const clientSessions = require("client-sessions");
-
+const authData = require('./auth-service');
 
 const app = express();
 
@@ -75,15 +75,23 @@ app.engine('.hbs', exphbs.engine({
             let day = dateObj.getDate().toString();
             return `${year}-${month.padStart(2, '0')}-${day.padStart(2,'0')}`;
         },
-        ensureLogon: function(req, res, next) {
-            if (!req.session.userName) {
-              res.redirect("/login");
+        ensureLogin: function(req, res, next){
+            if (!req.session.user) {
+                res.redirect('/login');
             } else {
-              next();
+                next();
             }
-          }          
+        },
     }
 }));
+
+function ensureLogin(req, res, next) {
+    if (!req.session.user) {
+        res.redirect('/login');
+    } else {
+        next();
+    }
+}
 
 app.set('view engine', '.hbs');
 
