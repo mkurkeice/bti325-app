@@ -18,6 +18,9 @@ const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
 const exphbs = require('express-handlebars');
 const stripJs = require('strip-js');
+const mongoose = require('mongoose');
+const clientSessions = require("client-sessions");
+
 
 const app = express();
 
@@ -31,6 +34,18 @@ cloudinary.config({
     api_secret: 'cjVJ1snC---W_cPsh7IRZyP77nE',
     secure: true
 });
+
+app.use(clientSessions({
+    cookieName: "session",
+    secret: "yourSecretKey", 
+    duration: 24 * 60 * 60 * 1000, 
+    activeDuration: 1000 * 60 * 5 
+}));
+  
+app.use(function(req, res, next) {
+    res.locals.session = req.session;
+    next();
+});  
 
 const upload = multer(); //no { storage : storage } because not using disk storage
 
@@ -59,7 +74,14 @@ app.engine('.hbs', exphbs.engine({
             let month = (dateObj.getMonth() + 1).toString();
             let day = dateObj.getDate().toString();
             return `${year}-${month.padStart(2, '0')}-${day.padStart(2,'0')}`;
-        }
+        },
+        ensureLogon: function(req, res, next) {
+            if (!req.session.userName) {
+              res.redirect("/login");
+            } else {
+              next();
+            }
+          }          
     }
 }));
 
@@ -84,7 +106,50 @@ app.get('/about', (req, res) => { //redirect user to about.html
     res.render('about');
 });
 
-app.get('/blog', async (req, res) => {
+app.get('/login', (req, res) => {
+    res.render('login');
+});
+
+app.post('/login', (req, res) => {
+    req.body.userAgent = req.get('User-Agent');
+    authData.checkUser(req.body)
+        .then((user) => {
+            req.session.user = {
+                userName: user.userName,
+                email: user.email,
+                loginHistory: user.loginHistory
+            };
+            res.redirect('/posts');
+        })
+        .catch((err) => {
+            res.render('login', { errorMessage: err, userName: req.body.userName });
+        });
+});
+
+app.get('/register', (req, res) => {
+    res.render('register');
+});
+
+app.post('/register', (req, res) => {
+    authData.registerUser(req.body)
+        .then(() => {
+            res.render('register', { successMessage: "User created" });
+        })
+        .catch((err) => {
+            res.render('register', { errorMessage: err, userName: req.body.userName });
+        });
+});
+
+app.get('/logout', (req, res) => {
+    req.session.reset();
+    res.redirect('/');
+});
+
+app.get('/userHistory', ensureLogin, (req, res) => {
+    res.render('userHistory');
+});
+
+app.get('/blog', ensureLogin, async (req, res) => {
     // Declare an object to store properties for the view
     let viewData = {};
     try{
@@ -120,7 +185,7 @@ app.get('/blog', async (req, res) => {
     res.render("blog", {data: viewData})
 });
 
-app.get('/posts', (req, res) => {
+app.get('/posts', ensureLogin, (req, res) => {
     let queryPromise = null;
     if (req.query.category) {
         queryPromise = blogData.getPostsByCategory(req.query.category);
@@ -137,7 +202,7 @@ app.get('/posts', (req, res) => {
 });
 
 
-app.post('/posts/add', upload.single('featureImage'), (req, res) =>{
+app.post('/posts/add', ensureLogin, upload.single('featureImage'), (req, res) =>{
     if(req.file){
         let streamUpload = (req) => {
             return new Promise((resolve, reject) => {
@@ -179,7 +244,7 @@ app.post('/posts/add', upload.single('featureImage'), (req, res) =>{
     }  
 });
 
-app.get('/posts/add', (req, res) => {
+app.get('/posts/add', ensureLogin, (req, res) => {
     blogData.getCategories().then((data)=>{
         res.render("addPost", {categories: data});
      }).catch((err) => {
@@ -188,7 +253,7 @@ app.get('/posts/add', (req, res) => {
     });
 });
 
-app.get('/posts/delete/:id', (req, res) =>{
+app.get('/posts/delete/:id', ensureLogin, (req, res) =>{
     blogData.deletePostById(req.params.id).then(()=>{
         res.redirect("/posts");
     }).catch((err)=>{
@@ -197,7 +262,7 @@ app.get('/posts/delete/:id', (req, res) =>{
 });
 
 
-app.get('/post/:id', (req,res)=>{
+app.get('/post/:id', ensureLogin, (req,res)=>{
     blogData.getPostById(req.params.id).then(data=>{
         res.json(data);
     }).catch(err=>{
@@ -205,7 +270,7 @@ app.get('/post/:id', (req,res)=>{
     });
 });
 
-app.get('/blog/:id', async (req, res) => {
+app.get('/blog/:id', ensureLogin, async (req, res) => {
     // Declare an object to store properties for the view
     let viewData = {};
     try{
@@ -245,7 +310,7 @@ app.get('/blog/:id', async (req, res) => {
     res.render("blog", {data: viewData})
 });
 
-app.get('/categories', (req, res) => {
+app.get('/categories', ensureLogin, (req, res) => {
     blogData.getCategories().then((data => {
         (data.length > 0) ? res.render("categories", {categories: data}) : res.render("categories",{ message: "no results" });
     })).catch(err => {
@@ -254,11 +319,11 @@ app.get('/categories', (req, res) => {
 });
 
 
-app.get('/categories/add', (req, res) =>{
+app.get('/categories/add', ensureLogin, (req, res) =>{
     res.render('addCategory');
 });
 
-app.post('/categories/add', (req, res) => {
+app.post('/categories/add', ensureLogin, (req, res) => {
     blogData.addCategory(req.body).then(category=>{
         res.redirect("/categories");
     }).catch(err=>{
@@ -266,7 +331,7 @@ app.post('/categories/add', (req, res) => {
     })
 });
 
-app.get('/categories/delete/:id', (req, res) =>{
+app.get('/categories/delete/:id', ensureLogin, (req, res) =>{
     blogData.deleteCategoryById(req.params.id).then(()=>{
         res.redirect("/categories");
     }).catch((err)=>{
@@ -280,12 +345,13 @@ app.get((req, res) => {
     res.status(404).render("404"); // render 404.hbs
 });
 
-blogData.initialize() //server starts if .json files successfully parse
-    .then(() => {
-        app.listen(HTTP_PORT, () => {
-            console.log(`Server listening on port ${HTTP_PORT}`); //initialization successful, server starts
+blogData.initialize()
+    .then(authData.initialize)
+    .then(function(){
+        app.listen(HTTP_PORT, function(){
+            console.log("app listening on: " + HTTP_PORT);
         });
-    })
-    .catch(err => {    
-        console.error(`Failed to initialize data: ${err}`); //log error, server does not start
+    }).catch(function(err){
+        console.log("unable to start server: " + err);
     });
+
